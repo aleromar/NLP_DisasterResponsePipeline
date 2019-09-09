@@ -49,7 +49,7 @@ def tokenize(text):
     return clean_tokens
 
 # load data
-database_filepath = r'./data/DisasterResponse.db'
+database_filepath = r'../data/DisasterResponse.db' #database_filepath = r'./data/DisasterResponse.db' 
 engine = create_engine('sqlite:///'+database_filepath)
 df = pd.read_sql_table('DisasterResponseTable',engine)
 #engine = create_engine('sqlite:///../data/DisasterResponse.db')
@@ -57,7 +57,7 @@ df = pd.read_sql_table('DisasterResponseTable',engine)
 
 # load model
 #model = pickle.load(open('./models/classifier.pkl', 'rb'))
-model = joblib.load("./models/classifier.pkl")
+model = joblib.load("../models/classifier.pkl")
 
 
 # index webpage displays cool visuals and receives user input text for model
