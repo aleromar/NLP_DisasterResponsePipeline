@@ -9,6 +9,19 @@ from sklearn.multioutput import MultiOutputClassifier
 from sklearn.ensemble import RandomForestClassifier
 
 def load_data(messages_filepath, categories_filepath):
+"""
+Creates a new dataframe by combining information
+from messages and categories
+
+Args:
+    messages_filepath: Path where the message file is located,
+                       including filename
+    categories_filepath: Path where the categories file is located,
+                         including filename
+
+Returns:
+    A dataframe that contains information from both input files.
+"""
     messages = pd.read_csv(messages_filepath)
     try:
         messages.drop(columns='original',inplace=True)
@@ -19,6 +32,15 @@ def load_data(messages_filepath, categories_filepath):
     return df
 
 def clean_data(df):
+"""
+Performs data cleaning on a dataframe
+
+Args:
+    df: dataframe to be cleaned
+
+Returns:
+    A dataframe that results on cleaning the input dataframe
+"""
     categories = df.categories.str.split(';',expand=True)
     row = categories.iloc[0,:]
     category_colnames = [x.split('-')[0] for x in row] 
@@ -36,6 +58,14 @@ def clean_data(df):
     return df
 
 def save_data(df, database_filename):
+"""
+Saves data stored in a dataframe into an sql database
+
+Args:
+    df: dataframe that includes the information to be saved
+    database_filename: Path where the database needs to be created.
+
+"""
     engine = create_engine('sqlite:///'+database_filename) 
     df.to_sql('DisasterResponseTable', engine, index=False, if_exists='replace')
 

@@ -23,6 +23,15 @@ from sklearn.externals import joblib
 class StartingVerbExtractor(BaseEstimator, TransformerMixin):
 
     def starting_verb(self, text):
+    """
+    Determines whether a sentence starts with a verb
+    
+    Args:
+        text: the sentence to be analysed
+    
+    Returns:
+        True if a verb is the first word, otherwise False
+    """
         sentence_list = nltk.sent_tokenize(text)
         for sentence in sentence_list:
             pos_tags = nltk.pos_tag(tokenize(sentence))
@@ -34,9 +43,28 @@ class StartingVerbExtractor(BaseEstimator, TransformerMixin):
         return False
 
     def fit(self, x, y=None):
+    """
+    Fits this custom estimator
+    
+    Args:
+        x: independent features
+        y: dependant variable
+    
+    Returns:
+        The custom estimator
+    """
         return self
 
     def transform(self, X):
+    """
+    Applies starting_verb to a series of messages
+    
+    Args:
+        X: the dataframe that contains a set of messages to be processed.
+    
+    Returns:
+        A dataframe resulting in processing the input dataframe
+    """
         X_tagged = pd.Series(X).apply(self.starting_verb)
         return pd.DataFrame(X_tagged)
     
@@ -58,6 +86,18 @@ class ArmClassifier(BaseEstimator, ClassifierMixin):
         return self.classy.predict(X)
 
 def load_data(database_filepath):
+"""
+Reads information from a database and creates three output elements.
+
+Args:
+    database_filepath: Path where the database file is located,
+                       including filename
+
+Returns:
+    X: A numpy matrix containing all the features
+    y: A numpy vector containing the labels
+    categories: names (of features) for each of the columns in X in order
+"""
     engine = create_engine('sqlite:///'+database_filepath)
     df = pd.read_sql_table('DisasterResponseTable',engine)
     X = df[['message']].values.flatten()#,'genre']]
@@ -66,6 +106,15 @@ def load_data(database_filepath):
     return X,y,categories
 
 def tokenize(text):
+"""
+Reads information from a database and creates three output elements.
+
+Args:
+    text: string to be tokenized
+
+Returns:
+    tokens: a list of words (tokens) contained in the input string
+"""
     alphanumregex = r'[a-z]'
     p = re.compile(alphanumregex)
     text = text.lower().strip()
@@ -80,6 +129,16 @@ def tokenize(text):
     return tokens
 
 def build_model():
+"""
+Creates a model object that can be trained and used for predictions
+It uses an ML pipeline and grid search for optimization
+
+Args:
+    None
+
+Returns:
+    cv: the model to use
+"""
     pipeline = Pipeline([
         ('features', FeatureUnion([
             ('text_pipeline', Pipeline([
@@ -108,6 +167,16 @@ def build_model():
     return cv
 
 def evaluate_model(model, X_test, Y_test, category_names):
+"""
+Creates and prints performance metrics for the model
+
+Args:
+    model: the model for which the metrics need be printed
+    X_test: the features to test the model
+    Y_test: the labels linked to X_test
+    category_names: names for the features in X_test
+
+"""
     ypred = model.predict(X_test)
     df_results = pd.DataFrame(index = ['f1-score', 'recall','precision'],columns=category_names)
     for i,col in enumerate(df_results.columns):
@@ -132,6 +201,14 @@ def evaluate_model(model, X_test, Y_test, category_names):
     print(df_results)
 
 def save_model(model, model_filepath):
+"""
+Saves the trained model in a pickle file
+
+Args:
+    model: model to be saved
+    model_filepath: Path where the model needs to be stored.
+
+"""
     filename = model_filepath
     joblib.dump(model, filename)
 
